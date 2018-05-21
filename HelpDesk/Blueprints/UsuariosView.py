@@ -19,9 +19,9 @@ def usuarios_listar():
 @usuarios.route("/usuarios/",methods=["POST"])
 def usuarios_cadastrar():
     try:
-        print request.headers
+        print(request.headers)
         res = request.get_json()
-        print res
+        print(res)
         user = Usuarios(res['nome'],res['email'])
         db.session.add(user)
         db.session.commit()
