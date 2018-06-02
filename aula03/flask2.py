@@ -1,19 +1,24 @@
-from flask import Flask, jsonify, request, json
-from flask_mongoengine import MongoEngine
+from flask import Flask, jsonify, request
 from datetime import datetime
+from flask_pymongo import PyMongo
+from bson import json_util
+import json, re
+
+
 from faker import Faker
-fake = Faker()
+fake = Faker('pt_BR')
 
 app = Flask(__name__) # main
+app.config['MONGO_DBNAME'] = 'orquestrador'
+mongo = PyMongo(app)
 
-# configuração do banco de dados
-app.config['MONGODB_SETTINGS'] = {'db':'orquestrador'}
-db = MongoEngine(app)
-
-class Usuarios(db.Document):
-    nome = db.StringField()
-    email = db.StringField()
-    dcadastro = db.DateTimeField(default=datetime.now())
+fname = fake.name()
+femail = fake.email()
+fcpf = fake.cpf()
+print(fname+' '+femail+' '+fcpf)
+# print(fname)
+# print(femail)
+# print(dir(fake))
 
 @app.route('/usuarios', methods=['GET', 'POST'])
 @app.route('/usuarios/', methods=['GET', 'POST'])
@@ -28,11 +33,10 @@ def usuarios():
                                          'message' : 'Usuário cadastrado com sucesso!'}))
     else:
         nome = request.args.get('nome')
-        # se nome não vazio
-        if nome: # mesma coisa que is not None:
-            return jsonify(Usuarios.objects(nome=nome))
-        else:
-            return jsonify(Usuarios.objects())
+        nome = re.compile(nome, re.IGNORECASE)
+        usuarios = [json.loads(json_util.dumps(u)) for u in mongo.db.usuarios.find({'nome' : nome})]
+        print(usuarios)
+        return jsonify(usuarios)
 
         # users = [u for u in Usuarios.objects]
         # users = sorted(users, key=lambda u : u['nome']) # organiza por ordem alfabética de nome
