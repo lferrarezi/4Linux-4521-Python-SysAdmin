@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Orquestrador</title>
+        <style>html {font-family:sans-serif}</style>
+    </head>
+    <body>
+        <h1>Orquestrador</h1>
+        <table>
+            <tr>
+                <td>ID:</td>
+                <td>NOME:</td>
+                <td>EMAIL:</td>
+                <td>DATA DO CADASTRO:</td>
+            </tr>
+            {% for u in usuarios %}
+            <tr>
+                <td>{{u['_id']}}</td>
+                <td>{{u['nome']}}</td>
+                <td>{{u['email']}}</td>
+                <td>{{u['dcadastro']}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <h2>Cadastro</h2>
+        <form id="form" action="/usuarios" method="post">
+            <table>
+                <tr>
+                    <td><b>Nome:</b></td>
+                    <td><input type="text" id="nome" name="nome" /></td>
+                </tr>
+                <tr>
+                    <td><b>Email:</b></td>
+                    <td><input type="text" id="email" name="email" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="submit" name="enviar" value="Enviar" /></td>
+                </tr>
+            </table>
+        </form>
+        <script>
+            var form = document.getElementById('form');
+            form.onsubmit=function(e) {
+                e.preventDefault();
+                var json = {
+                    nome : document.getElementById('nome').value.trim(),
+                    email : document.getElementById('email').value.trim()
+                };
+                if (!json.nome || !json.email) {
+                    alert('Os campos devem ser todos preenchidos');
+                    return;
+                }
+                console.log(json);
+                var r = new XMLHttpRequest();
+                r.onload = function(response) {
+                    var json = JSON.parse(response.target.responseText);
+                    alert(json.message);
+                    document.location.href='/usuarios'
+                };
+                r.open(form.method, form.action);
+                r.setRequestHeader('Content-Type', 'application/json');
+                r.send(JSON.stringify(json));
+            };
+        </script>
+    </body>
+</html>
