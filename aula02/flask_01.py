@@ -26,14 +26,20 @@ def usuarios():
         return jsonify(request.get_json({'status' : 1,
                                          'message' : 'Usuário cadastrado com sucesso!'}))
     else:
-        users = [u for u in Usuarios.objects]
-        users = sorted(users, key=lambda u : u['nome']) # organiza por ordem alfabética de nome
-
-        map(lambda i : del i['_id'], users)
-        return jsonify(users)
+        print(request.args.get('nome'))
+        return jsonify(Usuarios.objects())
+        # users = [u for u in Usuarios.objects]
+        # users = sorted(users, key=lambda u : u['nome']) # organiza por ordem alfabética de nome
+        #
+        # map(lambda i : del i['_id'], users)
+        # return jsonify(users)
 
         # for u in Usuarios.objects:
         #     return jsonify(u)
+
+def remove_id(i):
+    del i['_id']
+    return i
 
 @app.route('/') # o app estanciado como flask está ouvindo o acesso na raiz (/)
 def index(): # esta é a função a ser executada quando do acesso na raiz (/)
